@@ -22,6 +22,9 @@
     button { padding:12px 18px; border:0; border-radius:12px; background:var(--me); color:#fff; cursor:pointer; font-size:1rem; }
     button.ghost { background:transparent; border:1px solid var(--bot); }
     button:disabled { opacity:.5; cursor:not-allowed; }
+    #banner { display:none; background:#f59e0b22; border:1px solid #f59e0b; color:#fbbf24; padding:8px 12px; border-radius:10px; font-size:.85rem; }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; }
+    .chips button { padding:6px 12px; font-size:.85rem; background:var(--card); border:1px solid var(--bot); }
   </style>
 </head>
 <body>
@@ -30,6 +33,13 @@
     <h1>AI Chatbot Assistant</h1>
     <button class="ghost" id="reset" type="button">New chat</button>
   </header>
+  <div id="banner">Demo mode: scripted replies, no API key needed. Add ANTHROPIC_API_KEY to use the real model.</div>
+  <div class="chips" id="chips">
+    <button type="button">How much are business cards?</button>
+    <button type="button">What are your opening hours?</button>
+    <button type="button">Do you deliver?</button>
+    <button type="button">Do you do gold foil?</button>
+  </div>
   <div id="log" aria-live="polite"></div>
   <form id="form">
     <input id="input" placeholder="Type your message..." autocomplete="off" required>
@@ -42,6 +52,15 @@
   const input = document.getElementById("input");
   const send = document.getElementById("send");
   let sessionId = null;
+
+  fetch("/api/info").then(r => r.json()).then(i => {
+    if (i.demo) document.getElementById("banner").style.display = "block";
+  }).catch(() => {});
+
+  document.querySelectorAll("#chips button").forEach(b => b.addEventListener("click", () => {
+    input.value = b.textContent;
+    form.requestSubmit();
+  }));
 
   function add(role, text) {
     const el = document.createElement("div");
